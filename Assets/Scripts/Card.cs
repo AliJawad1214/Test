@@ -39,6 +39,7 @@ public class Card : MonoBehaviour
 
     public void OnCardClick()
     {
+        SoundManager.Instance.PlayCardClick();
         cardManager.SetSelected(this);
     }
 
