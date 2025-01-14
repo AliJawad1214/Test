@@ -155,12 +155,12 @@ MonoBehaviour:
   cardPrefab: {fileID: -587038024898516605, guid: 4a6772e4c0cdb9b47b797ac8997e07d5, type: 3}
   cardContainer: {fileID: 1824537232}
   cardSprites:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 9e3bd18555efa5c48a1738fbd4723f0a, type: 3}
+  - {fileID: 21300000, guid: bb214eaf6b8c4bd4a835d0780db52be6, type: 3}
+  - {fileID: 21300000, guid: 798fe58ebdff91840adced0531c855c6, type: 3}
+  - {fileID: 21300000, guid: 10fd804d71583794c89d7d82120bb98a, type: 3}
+  - {fileID: 21300000, guid: f048eb7f429fdf343a6c2fb3360753e5, type: 3}
+  - {fileID: 21300000, guid: e9df4f10b2c314746892c57f0507053e, type: 3}
 --- !u!4 &145355718
 Transform:
   m_ObjectHideFlags: 0

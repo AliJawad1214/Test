@@ -42,7 +42,17 @@ public class CardManager : MonoBehaviour
     {
         for (int i = 0; i < cardPairs.Count; i++)
         {
-            Instantiate(cardPrefab, cardContainer);
+            Card card = Instantiate(cardPrefab, cardContainer);
+            card.SetFrontSide(cardPairs[i]);
+            card.cardManager = this;
+        }
+    }
+
+    public void SetSelected(Card card)
+    {
+        if (card.isSlected == false)
+        {
+            card.Show();
         }
     }
 }
