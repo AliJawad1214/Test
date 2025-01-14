@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class CardManager : MonoBehaviour
 {
     [SerializeField] private Card cardPrefab;
     [SerializeField] private Transform cardContainer;
     [SerializeField] private Sprite[] cardSprites;
+    [SerializeField] private TMP_Text scoreText;
+    private int score = 0;
     private List<Sprite> cardPairs;
+
+    private Card firstSelected, secondSelected;
 
     private void Start()
     {
@@ -53,6 +58,36 @@ public class CardManager : MonoBehaviour
         if (card.isSlected == false)
         {
             card.Show();
+            if (firstSelected == null)
+            {
+                firstSelected = card;
+                return;
+            }
+
+            if (secondSelected == null)
+            {
+                secondSelected = card;
+                StartCoroutine(Matching(firstSelected, secondSelected));
+                firstSelected = null;
+                secondSelected = null;
+            }
+        }
+    }
+
+    IEnumerator Matching(Card a, Card b)
+    {
+        yield return new WaitForSeconds(0.5f);
+        if (a.frontSide == b.frontSide)
+        {
+            score += 10;
+            scoreText.text = $"Score: {score}";
+            a.SetOpacity();
+            b.SetOpacity();
+        }
+        else
+        {
+            a.Hide();
+            b.Hide();
         }
     }
 }
