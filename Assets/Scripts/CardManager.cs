@@ -19,6 +19,12 @@ public class CardManager : MonoBehaviour
     private int totalPairs; 
     private int matchedPairs = 0; 
     private List<Sprite> cardPairs;
+    [SerializeField] private TMP_Text timerText;
+    private float timer;
+    [SerializeField] private float timeLeft = 60;
+    private bool isGameOver;
+    public GameObject gameOverPanel;
+
 
     private Card firstSelected, secondSelected;
 
@@ -30,7 +36,34 @@ public class CardManager : MonoBehaviour
         UpdateUI();
         PrepareSprites();
         InstantiateCards();
+        SetInitialCellSize();
+        ResetTimer();
     }
+
+    private void Update()
+    {
+        if (!isGameOver)
+        {
+            timer -= Time.deltaTime;
+            timerText.text = Mathf.Ceil(timer).ToString();
+
+            if (timer <= 0)
+            {
+                isGameOver = true;
+                gameOverPanel.SetActive(true);
+            }
+        }
+    }
+
+    private void SetInitialCellSize()
+    {
+        GridLayoutGroup gridLayout = cardContainer.GetComponent<GridLayoutGroup>();
+        if (gridLayout != null)
+        {
+            gridLayout.cellSize = new Vector2(200, 300);
+        }
+    }
+
     private void PrepareSprites()
     {
         totalPairs = (rows * columns) / 2; // Calculate pairs needed for current grid
@@ -76,6 +109,8 @@ public class CardManager : MonoBehaviour
         {
             gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayout.constraintCount = columns;
+
+            UpdateCardContainer();
         }
 
         for (int i = 0; i < cardPairs.Count; i++)
@@ -120,10 +155,11 @@ public class CardManager : MonoBehaviour
            
             if (matchedPairs == totalPairs)
             {
-                //score += 50; // Add bonus points for completing the level
+                //score += 50; // bonus points for completing the level
                 ShowLevelCompleted();
                 IncreaseDifficulty();
                 ResetBoard();
+                StopCoroutine("LoseTime");
             }
 
             a.SetOpacity();
@@ -172,17 +208,25 @@ public class CardManager : MonoBehaviour
     private void IncreaseDifficulty()
     {
         levelNumber++; // Increment the level number
-
-        // Increase grid size every 2 levels
-        if (levelNumber % 2 == 0)
+        if (columns >= 6 && rows >= 6)
         {
-            if (rows * columns / 2 < maxPairs) 
-            {
-                if (columns > rows) rows++;
-                else columns++;
-            }
+
+        }
+        else if (levelNumber % 2 == 0)
+        {
+            if (columns > rows)
+                rows++;
+            else
+                columns++;
         }
 
+        if ((rows * columns) % 2 != 0)
+        {
+            if (columns > rows)
+                rows++;
+            else columns++;
+        }
+        ResetTimer();
         SaveProgress(); 
         UpdateUI(); 
     }
@@ -202,4 +246,54 @@ public class CardManager : MonoBehaviour
         PrepareSprites(); 
         InstantiateCards(); 
     }
+
+    private void UpdateCardContainer()
+    {
+        GridLayoutGroup gridLayout = cardContainer.GetComponent<GridLayoutGroup>();
+        if (gridLayout != null)
+        {
+            gridLayout.padding = new RectOffset(30, 30, 50, 50);
+            // Calculate available width and height by subtracting spacing
+            RectTransform containerRect = cardContainer.GetComponent<RectTransform>();
+            float totalSpacingX = gridLayout.spacing.x * (columns - 1);
+            float totalSpacingY = gridLayout.spacing.y * (rows - 1);
+
+            float availableWidth = containerRect.rect.width - totalSpacingX - gridLayout.padding.left - gridLayout.padding.right;
+            float availableHeight = containerRect.rect.height - totalSpacingY - gridLayout.padding.top - gridLayout.padding.bottom;
+
+            // Calculate cell size proportional to the grid size
+            float cellWidth = availableWidth / columns;
+            float cellHeight = availableHeight / rows;
+
+            // Maintain aspect ratio of 200x300 for initial size
+            float aspectRatio = 200f / 300f;
+            if (cellWidth / cellHeight > aspectRatio)
+            {
+                cellWidth = cellHeight * aspectRatio;
+            }
+            else
+            {
+                cellHeight = cellWidth / aspectRatio;
+            }
+
+            // Set the calculated cell size
+            gridLayout.cellSize = new Vector2(cellWidth, cellHeight);
+        }
+    }
+
+    private void ResetTimer()
+    {
+        timer = timeLeft + (levelNumber - 1) * 10f;
+        isGameOver = false;
+    }
+
+    public void RestartLevel()
+    {
+        gameOverPanel.SetActive(false);
+        ResetBoard();
+        ResetTimer(); 
+        UpdateUI(); 
+        isGameOver = false; 
+    }
+
 }
